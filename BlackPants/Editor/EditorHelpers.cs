@@ -29,5 +29,28 @@ namespace BlackPants {
       string value = GetCommandLineArgumentValue(argument);
       return int.Parse(value);
     }
+
+    // Originally from https://answers.unity.com/questions/47377/how-to-programatically-enable-static-batching-in-t.html
+    public static void SetStaticBatchingEnabled(bool value) {
+      PlayerSettings[] playerSettings = Resources.FindObjectsOfTypeAll<PlayerSettings>();
+      SerializedObject playerSettingsSerializedObject = new SerializedObject(playerSettings);
+      SerializedProperty batchingSettings = playerSettingsSerializedObject.FindProperty("m_BuildTargetBatching");
+
+      // Iterate over all platforms
+      for (int i = 0; i < batchingSettings.arraySize; i++) {
+        SerializedProperty batchingArrayValue = batchingSettings.GetArrayElementAtIndex(i);
+        if (batchingArrayValue == null) {
+          continue;
+        }
+        IEnumerator batchingEnumerator = batchingArrayValue.GetEnumerator();
+        while (batchingEnumerator.MoveNext()) {
+          SerializedProperty property = (SerializedProperty)batchingEnumerator.Current;
+          if (property.name == "m_StaticBatching") {
+            property.boolValue = value;
+          }
+        }
+      }
+      playerSettingsSerializedObject.ApplyModifiedProperties();
+    }
   }
 }
