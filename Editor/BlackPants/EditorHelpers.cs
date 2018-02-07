@@ -1,3 +1,7 @@
+using System.Collections;
+using UnityEditor;
+using UnityEngine;
+
 namespace BlackPants {
   public static class EditorHelpers {
     public static string TryGetCommandLineArgumentValue(string argument) {
